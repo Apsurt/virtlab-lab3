@@ -18,9 +18,17 @@ void StartHeaterTask(void *argument) {
         // Wait indefinitely for a new temperature reading
         if (osMessageQueueGet(heaterQueueHandle, &temp, NULL, osWaitForever) == osOK) {
             
+            // Check switch 1 for debug mode (30C) or normal mode (50C)
+            uint16_t target_temp = getSwitch1() ? 300 : 500;
+            
             // Check switch 0 to see if the queue value is Celsius or Kelvin
-            // Target is 50°C -> 3231 for Kelvin (50 + 273.15)*10, 500 for Celsius (50 * 10)
-            uint16_t target = getSwitch0() ? 3231 : 500;
+            // Kelvin target = (target_temp_c + 273.15) * 10
+            uint16_t target;
+            if (getSwitch0()) {
+                target = target_temp == 300 ? 3031 : 3231;
+            } else {
+                target = target_temp;
+            }
             
             if (temp < target) {
                 // Temperature strictly less than target -> Turn ON (Set HIGH)
