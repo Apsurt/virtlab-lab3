@@ -9,6 +9,7 @@
 #include "cmsis_os.h"
 #include "io.h"
 #include <stdio.h>
+#include <math.h>
 
 // Simple logging macro
 #define LOG(fmt, ...) printf("[ACQ] " fmt "\r\n", ##__VA_ARGS__)
@@ -49,14 +50,25 @@ void StartAcquisitionTask( void *argument ) {
 
     LOG("AN3: %lu (%.2fV), AN4: %lu (%.2fV)", val3, voltage3, val4, voltage4);
 
-    // Send either AN3 or AN4 voltage to the queue based on SW0
-    uint16_t display_mv;
-    if (getSwitch0()) {
-        display_mv = (uint16_t)(voltage4 * 1000.0f);
-    } else {
-        display_mv = (uint16_t)(voltage3 * 1000.0f);
-    }
-    osMessageQueuePut(acquisitionQueueHandle, &display_mv, 0, 0);
+    // Calculate Temperature in Kelvin
+    // 1. Find R_NTC
+    // Formula: R_NTC = (10000.0 * V3) / (2.0 * V4 - V3)
+    float v3 = voltage3;
+    float v4 = voltage4;
+    float r_ntc = (10000.0f * v3) / (2.0f * v4 - v3);
+
+    // 2. Calculate T_C (Celsius)
+    // Formula: T_C = 25.0 + (log(R_NTC / 10000.0) / log(0.96))
+    float t_c = 25.0f + (logf(r_ntc / 10000.0f) / logf(0.96f));
+
+    // 3. Convert to Kelvin
+    float t_k = t_c + 273.15f;
+
+    LOG("R_NTC: %.1f Ohm, Temp: %.2f C, %.2f K", r_ntc, t_c, t_k);
+
+    // Send T_K * 10 to display (e.g., 298.1K -> 2981)
+    uint16_t display_val = (uint16_t)(t_k * 10.0f);
+    osMessageQueuePut(acquisitionQueueHandle, &display_val, 0, 0);
 
     // Run at 10Hz (100ms)
     static uint32_t tick = 0;

@@ -46,11 +46,6 @@ void StartDefaultTask( void *argument ) {
     uint16_t sensorValue = 0;
 
     while( 1 ) {
-        // Toggle LED0 at 10Hz for debugging
-        static int led_state = 0;
-        led0(led_state ? ON : OFF);
-        led_state = !led_state;
-
         // Receive data from acquisition queue (non-blocking)
         if (osMessageQueueGet(acquisitionQueueHandle, &sensorValue, NULL, 0) == osOK) {
             // Forward it to the display queue
