@@ -1,8 +1,8 @@
 /*
  * application.c
  *
- *  Created on: May 18, 2026
- *      Author: max
+ *  Created on: June 5, 2026
+ *      Author: tymonb
  */
 
 #include "main.h"
