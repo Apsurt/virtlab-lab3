@@ -137,7 +137,7 @@ void StartAcquisitionTask(void *argument);
 void StartDisplayTask(void *argument);
 
 /* USER CODE BEGIN PFP */
-
+void acquisitionTimerInterrupt(TIM_HandleTypeDef *htim);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -922,7 +922,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
+  acquisitionTimerInterrupt(htim);
   /* USER CODE END Callback 1 */
 }
 

@@ -30,11 +30,11 @@ static uint32_t adc1_raw = 0;
 static uint32_t adc2_raw = 0;
 
 /**
-  * @brief  Period elapsed callback in non blocking mode
+  * @brief  Custom function to be called from main.c's HAL_TIM_PeriodElapsedCallback
   * @param  htim: TIM handle
   * @retval None
   */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+void acquisitionTimerInterrupt(TIM_HandleTypeDef *htim) {
   if (htim->Instance == TIM1) {
     // Signal the task to start acquisition
     osEventFlagsSet(acquisitionEventFlags, FLAG_TIM1_TRIGGER);
