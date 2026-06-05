@@ -7,6 +7,7 @@
 
 #include "main.h"
 #include "cmsis_os.h"
+#include "io.h"
 #include <stdio.h>
 
 // Simple logging macro
@@ -48,9 +49,14 @@ void StartAcquisitionTask( void *argument ) {
 
     LOG("AN3: %lu (%.2fV), AN4: %lu (%.2fV)", val3, voltage3, val4, voltage4);
 
-    // Convert AN3 voltage to millivolts and send to queue
-    uint16_t an3_mv = (uint16_t)(voltage3 * 1000.0f);
-    osMessageQueuePut(acquisitionQueueHandle, &an3_mv, 0, 0);
+    // Send either AN3 or AN4 voltage to the queue based on SW0
+    uint16_t display_mv;
+    if (getSwitch0()) {
+        display_mv = (uint16_t)(voltage4 * 1000.0f);
+    } else {
+        display_mv = (uint16_t)(voltage3 * 1000.0f);
+    }
+    osMessageQueuePut(acquisitionQueueHandle, &display_mv, 0, 0);
 
     // Run at 10Hz (100ms)
     static uint32_t tick = 0;
