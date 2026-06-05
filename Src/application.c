@@ -43,13 +43,19 @@ void StartDefaultTask( void *argument ) {
 
     uint32_t tick = osKernelGetTickCount();
     const uint32_t frequency = 100; // 100ms for 10Hz
-    uint16_t dummyCounter = 0;
+    uint16_t sensorValue = 0;
 
     while( 1 ) {
-        // Send dummy counter to display task via queue
-        osMessageQueuePut(displayQueueHandle, &dummyCounter, 0, 0);
-        dummyCounter++;
-        if (dummyCounter > 9999) dummyCounter = 0;
+        // Toggle LED0 at 10Hz for debugging
+        static int led_state = 0;
+        led0(led_state ? ON : OFF);
+        led_state = !led_state;
+
+        // Receive data from acquisition queue (non-blocking)
+        if (osMessageQueueGet(acquisitionQueueHandle, &sensorValue, NULL, 0) == osOK) {
+            // Forward it to the display queue
+            osMessageQueuePut(displayQueueHandle, &sensorValue, 0, 0);
+        }
 
         // Wait for the next cycle (10Hz)
         tick += frequency;

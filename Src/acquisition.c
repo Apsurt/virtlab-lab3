@@ -16,6 +16,8 @@
 extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 
+extern osMessageQueueId_t acquisitionQueueHandle;
+
 // Acquisition task entry point
 
 void StartAcquisitionTask( void *argument ) {
@@ -45,6 +47,10 @@ void StartAcquisitionTask( void *argument ) {
     HAL_ADC_Stop(&hadc2);
 
     LOG("AN3: %lu (%.2fV), AN4: %lu (%.2fV)", val3, voltage3, val4, voltage4);
+
+    // Convert AN3 voltage to millivolts and send to queue
+    uint16_t an3_mv = (uint16_t)(voltage3 * 1000.0f);
+    osMessageQueuePut(acquisitionQueueHandle, &an3_mv, 0, 0);
 
     // Run at 10Hz (100ms)
     static uint32_t tick = 0;
