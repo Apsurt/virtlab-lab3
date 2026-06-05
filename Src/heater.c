@@ -13,6 +13,7 @@ extern osMessageQueueId_t heaterQueueHandle;
 
 void StartHeaterTask(void *argument) {
     uint16_t temp;
+    int led_state = OFF;
     for(;;) {
         // Wait indefinitely for a new temperature reading
         if (osMessageQueueGet(heaterQueueHandle, &temp, NULL, osWaitForever) == osOK) {
@@ -24,9 +25,19 @@ void StartHeaterTask(void *argument) {
             if (temp < target) {
                 // Temperature strictly less than target -> Turn ON (Set HIGH)
                 HAL_GPIO_WritePin(IO10_GPIO_GPIO_Port, IO10_GPIO_Pin, GPIO_PIN_SET);
+                
+                // Toggle LEDs for blinking effect
+                led_state = (led_state == ON) ? OFF : ON;
+                led0(led_state);
+                led1(led_state);
             } else {
                 // Temperature equal or greater than target -> Turn OFF (Set LOW)
                 HAL_GPIO_WritePin(IO10_GPIO_GPIO_Port, IO10_GPIO_Pin, GPIO_PIN_RESET);
+                
+                // Ensure LEDs are OFF when heater is OFF
+                led_state = OFF;
+                led0(OFF);
+                led1(OFF);
             }
         }
     }
