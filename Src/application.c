@@ -11,6 +11,7 @@
 
 extern osMessageQueueId_t acquisitionQueueHandle;
 extern osMessageQueueId_t displayQueueHandle;
+extern osMessageQueueId_t heaterQueueHandle;
 
 void StartDefaultTask( void *argument ) {
     uint32_t tick = osKernelGetTickCount();
@@ -20,6 +21,7 @@ void StartDefaultTask( void *argument ) {
     while( 1 ) {
         if (osMessageQueueGet(acquisitionQueueHandle, &sensorValue, NULL, 0) == osOK) {
             osMessageQueuePut(displayQueueHandle, &sensorValue, 0, 0);
+            osMessageQueuePut(heaterQueueHandle, &sensorValue, 0, 0);
         }
 
         tick += frequency;

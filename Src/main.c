@@ -116,6 +116,18 @@ const osMessageQueueAttr_t displayQueue_attributes = {
   .mq_mem = &displayQueueBuffer,
   .mq_size = sizeof(displayQueueBuffer)
 };
+/* Definitions for heaterQueue */
+osMessageQueueId_t heaterQueueHandle;
+const osMessageQueueAttr_t heaterQueue_attributes = {
+  .name = "heaterQueue"
+};
+/* Definitions for heaterTask */
+osThreadId_t heaterTaskHandle;
+const osThreadAttr_t heaterTask_attributes = {
+  .name = "heaterTask",
+  .stack_size = 1024,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -135,6 +147,7 @@ static void MX_ADC2_Init(void);
 void StartDefaultTask(void *argument);
 void StartAcquisitionTask(void *argument);
 void StartDisplayTask(void *argument);
+void StartHeaterTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 void acquisitionTimerInterrupt(TIM_HandleTypeDef *htim);
@@ -209,6 +222,9 @@ int main(void)
   /* creation of displayQueue */
   displayQueueHandle = osMessageQueueNew (1, sizeof(uint16_t), &displayQueue_attributes);
 
+  /* creation of heaterQueue */
+  heaterQueueHandle = osMessageQueueNew (1, sizeof(uint16_t), &heaterQueue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -222,6 +238,9 @@ int main(void)
 
   /* creation of displayTask */
   displayTaskHandle = osThreadNew(StartDisplayTask, NULL, &displayTask_attributes);
+
+  /* creation of heaterTask */
+  heaterTaskHandle = osThreadNew(StartHeaterTask, NULL, &heaterTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
