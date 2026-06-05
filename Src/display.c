@@ -20,18 +20,25 @@ extern osMessageQueueId_t displayQueueHandle;
 void StartDisplayTask( void *argument ) {
   LOG("Display task started");
 
-  // Show '1234' on the LCD display
-  lcdWriteDigit('1', 0);
-  lcdWriteDigit('2', 1);
-  lcdWriteDigit('3', 2);
-  lcdWriteDigit('4', 3);
-  lcdUpdateDisplay();
-
-  LOG("LCD initialized with '1234'");
+  uint16_t displayValue = 0;
+  char buf[5];
 
   /* Infinite loop */
   for( ; ; ) {
-    osDelay( 1 );
+    // Wait for a message from the queue (blocking)
+    if (osMessageQueueGet(displayQueueHandle, &displayValue, NULL, osWaitForever) == osOK) {
+        LOG("Received value: %u", displayValue);
+
+        // Convert to 4-digit string
+        snprintf(buf, sizeof(buf), "%04u", displayValue % 10000);
+
+        // Update LCD
+        lcdWriteDigit(buf[0], 0);
+        lcdWriteDigit(buf[1], 1);
+        lcdWriteDigit(buf[2], 2);
+        lcdWriteDigit(buf[3], 3);
+        lcdUpdateDisplay();
+    }
   }
 }
 
