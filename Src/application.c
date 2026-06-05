@@ -46,11 +46,6 @@ void StartDefaultTask( void *argument ) {
     uint16_t dummyCounter = 0;
 
     while( 1 ) {
-        // Toggle LED0 at 10Hz for debugging
-        static int led_state = 0;
-        led0(led_state ? ON : OFF);
-        led_state = !led_state;
-
         // Send dummy counter to display task via queue
         osMessageQueuePut(displayQueueHandle, &dummyCounter, 0, 0);
         dummyCounter++;
@@ -61,4 +56,3 @@ void StartDefaultTask( void *argument ) {
         osDelayUntil(tick);
     }
 }
-
