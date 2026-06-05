@@ -19,10 +19,9 @@ extern TIM_HandleTypeDef htim1;
 // Simple logging macro
 #define LOG(fmt, ...) printf("[DEBUG] " fmt "\r\n", ##__VA_ARGS__)
 
-// Dummy __io_putchar for printf support
-// In a real scenario, this would send data to UART or ITM
+// Redirect printf to ITM (Serial Wire Viewer) for STM32CubeIDE
 int __io_putchar(int ch) {
-    // Placeholder for actual output implementation
+    ITM_SendChar(ch);
     return ch;
 }
 
