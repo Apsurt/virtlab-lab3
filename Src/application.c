@@ -40,16 +40,7 @@ extern osMessageQueueId_t acquisitionQueueHandle;
 extern osMessageQueueId_t displayQueueHandle;
 
 void StartDefaultTask( void *argument ) {
-    LOG("System started. Initializing LCD...");
-
-    // Show '1234' on the LCD display
-    lcdWriteDigit('1', 0);
-    lcdWriteDigit('2', 1);
-    lcdWriteDigit('3', 2);
-    lcdWriteDigit('4', 3);
-    lcdUpdateDisplay();
-
-    LOG("LCD updated with '1234'");
+    LOG("System started.");
 
 	while( 1 ) {
 		if( getSwitch0() ) { // Blink LEDs
