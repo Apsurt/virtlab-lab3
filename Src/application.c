@@ -40,30 +40,23 @@ extern osMessageQueueId_t acquisitionQueueHandle;
 extern osMessageQueueId_t displayQueueHandle;
 
 void StartDefaultTask( void *argument ) {
-    LOG("System started.");
+    LOG("Main application loop started at 10Hz.");
 
-	while( 1 ) {
-		if( getSwitch0() ) { // Blink LEDs
-            LOG("Switch 0 pressed - Blinking LEDs");
-			while( getSwitch0() ) {
-				led0( OFF );
-				led1( ON );
-				led2( OFF );
-				led3( ON );
-				osDelay( 500 );
-				led0( ON );
-				led1( OFF );
-				led2( ON );
-				led3( OFF );
-				osDelay( 500 );
-			}
-            LOG("Switch 0 released");
-		} else if( getSwitch1() ) { // This must be filled by students, to perform requested functions
-            LOG("Switch 1 pressed");
-			while( getSwitch1() );
-            LOG("Switch 1 released");
-		}
-        osDelay(100);
-	}
+    uint32_t tick = osKernelGetTickCount();
+    const uint32_t frequency = 100; // 100ms for 10Hz
+
+    while( 1 ) {
+        // Toggle LED0 at 10Hz for debugging
+        static int led_state = 0;
+        led0(led_state ? ON : OFF);
+        led_state = !led_state;
+
+        // TODO: Process messages from acquisitionQueueHandle
+        // TODO: Send updates to displayQueueHandle
+
+        // Wait for the next cycle (10Hz)
+        tick += frequency;
+        osDelayUntil(tick);
+    }
 }
 
